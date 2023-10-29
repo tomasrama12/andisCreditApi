@@ -1,7 +1,9 @@
 using CreditCardApi.DataAccess;
 using CreditCardApi.DataAccess.Repositories;
 using CreditCardApi.Models;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,31 @@ builder.Services.AddDbContext<DBCreditCardMock>(opt =>
 //DI
 builder.Services.AddScoped<ICreditCardRepository, CreditCardRepository>();
 
+builder.Services.AddRateLimiter(options => {
+    options.RejectionStatusCode = 429;
+    options.OnRejected = async (context, token) =>
+    {
+        await context.HttpContext.Response.WriteAsync("muchas llamadas, por favor prueba mas tarde ");
+    };
+    options.AddFixedWindowLimiter("Web", options =>
+    {
+        options.AutoReplenishment = true;
+        options.PermitLimit = 5;
+        options.Window = TimeSpan.FromMinutes(1);
+    });
+    options.AddConcurrencyLimiter(policyName: "concurrency", options => {
+        options.PermitLimit = 10;
+        options.QueueLimit = 0;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+    
+});
+
 var app = builder.Build();
+app.UseRateLimiter();
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

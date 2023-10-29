@@ -6,6 +6,7 @@ using CreditCardApi.DataAccess.Repositories;
 using CreditCardApi.DTOs;
 using CreditCardApi.DTOs.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace CreditCardApi.Controllers
 {
@@ -17,13 +18,16 @@ namespace CreditCardApi.Controllers
 
         public CreditCardController(ICreditCardRepository creditCardRepo){
             this.creditCardRepository = creditCardRepo;
-        }
+        }   
+
+        [EnableRateLimiting("Web")]
         [HttpGet]
         public async Task<IActionResult> GetCards()
         {
            return Ok(await this.creditCardRepository.GetCreditCardsAsync());
         }
 
+        [EnableRateLimiting("concurrency")]
         [HttpPost]
         public async Task<IActionResult> PostCard()
         {

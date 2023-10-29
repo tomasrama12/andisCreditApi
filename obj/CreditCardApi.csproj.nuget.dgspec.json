@@ -1,25 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "/Users/agustinlorenzo/Desktop/andisCreditApi/CreditCardApi.csproj": {}
+    "C:\\Users\\Tomás\\OneDrive\\Escritorio\\andisCredit\\andisCreditApi\\CreditCardApi.csproj": {}
   },
   "projects": {
-    "/Users/agustinlorenzo/Desktop/andisCreditApi/CreditCardApi.csproj": {
+    "C:\\Users\\Tomás\\OneDrive\\Escritorio\\andisCredit\\andisCreditApi\\CreditCardApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/agustinlorenzo/Desktop/andisCreditApi/CreditCardApi.csproj",
+        "projectUniqueName": "C:\\Users\\Tomás\\OneDrive\\Escritorio\\andisCredit\\andisCreditApi\\CreditCardApi.csproj",
         "projectName": "CreditCardApi",
-        "projectPath": "/Users/agustinlorenzo/Desktop/andisCreditApi/CreditCardApi.csproj",
-        "packagesPath": "/Users/agustinlorenzo/.nuget/packages/",
-        "outputPath": "/Users/agustinlorenzo/Desktop/andisCreditApi/obj/",
+        "projectPath": "C:\\Users\\Tomás\\OneDrive\\Escritorio\\andisCredit\\andisCreditApi\\CreditCardApi.csproj",
+        "packagesPath": "C:\\Users\\Tomás\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Tomás\\OneDrive\\Escritorio\\andisCredit\\andisCreditApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/agustinlorenzo/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Tomás\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -78,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.401/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }
