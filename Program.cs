@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DBCreditCardMock>(opt =>
@@ -22,29 +21,39 @@ builder.Services.AddScoped<ICreditCardRepository, CreditCardRepository>();
 
 builder.Services.AddRateLimiter(options => {
     options.RejectionStatusCode = 429;
-    options.OnRejected = async (context, token) =>
-    {
-        await context.HttpContext.Response.WriteAsync("muchas llamadas, por favor prueba mas tarde ");
-    };
-    options.AddFixedWindowLimiter("Web", options =>
+    options.AddFixedWindowLimiter("FixedWindow", options =>
     {
         options.AutoReplenishment = true;
         options.PermitLimit = 5;
         options.Window = TimeSpan.FromMinutes(1);
     });
-    options.AddConcurrencyLimiter(policyName: "concurrency", options => {
-        options.PermitLimit = 10;
+    options.AddConcurrencyLimiter("Concurrency", options => {
+        options.PermitLimit = 1;
         options.QueueLimit = 0;
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueProcessingOrder = QueueProcessingOrder.NewestFirst;    
     });
-    
+    options.AddSlidingWindowLimiter("SlidingWindow", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 2;
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.NewestFirst;
+        limiterOptions.QueueLimit = 1;
+        limiterOptions.SegmentsPerWindow = 5;
+        limiterOptions.AutoReplenishment = true;
+        limiterOptions.Window = TimeSpan.FromSeconds(15);
+    });
+    options.AddTokenBucketLimiter("TokenBucket", limiterOptions =>
+    {
+        limiterOptions.TokensPerPeriod = 2;
+        limiterOptions.TokenLimit = 10;
+        limiterOptions.QueueLimit = 0;
+        limiterOptions.AutoReplenishment = true;
+        limiterOptions.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+    });
 });
 
 var app = builder.Build();
+
 app.UseRateLimiter();
-
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -53,10 +62,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
