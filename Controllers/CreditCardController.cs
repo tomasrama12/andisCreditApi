@@ -12,28 +12,28 @@ namespace CreditCardApi.Controllers
 {
     [ApiController]
     [Route("api/v1/cards")]
+    
     public class CreditCardController : ControllerBase
     {
         private ICreditCardRepository creditCardRepository = null;
-
         public CreditCardController(ICreditCardRepository creditCardRepo){
             this.creditCardRepository = creditCardRepo;
         }   
 
-        [EnableRateLimiting("Web")]
+        [EnableRateLimiting("SlidingWindow")]
         [HttpGet]
         public async Task<IActionResult> GetCards()
         {
            return Ok(await this.creditCardRepository.GetCreditCardsAsync());
         }
-
-        [EnableRateLimiting("concurrency")]
+        [EnableRateLimiting("Concurrency")]
         [HttpPost]
         public async Task<IActionResult> PostCard()
         {
             return Ok(await this.creditCardRepository.PostCreditCardByIdAsync());
         }
 
+        [EnableRateLimiting("FixedWindow")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCardById(long id)
         {
@@ -47,6 +47,7 @@ namespace CreditCardApi.Controllers
             return Ok(await this.creditCardRepository.PostMovement(id, movement));
         }
 
+        [EnableRateLimiting("TokenBucket")]
         [HttpGet("/movements/{movementId}")]
         public async Task<IActionResult> GetMovementById(long movementId)
         {
