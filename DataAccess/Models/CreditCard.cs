@@ -42,5 +42,9 @@ namespace CreditCardApi.Models
             this.AmountSpent += amount;
             return true;
         }
+        
+        public void printCard(){
+            
+        }
     }
 }

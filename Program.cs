@@ -4,16 +4,26 @@ using CreditCardApi.Models;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DBCreditCardMock>(opt =>
     opt.UseInMemoryDatabase("CreditCardMock")
+);
+builder.Services.AddOutputCache(options => {
+    options.AddBasePolicy(policy => policy
+        .Expire(TimeSpan.FromMinutes(10)));
+    options.AddPolicy("PicturePolicy", policy => policy
+        .Expire(TimeSpan.FromMinutes(5)));
+
+    
+}
+    
 );
 
 //DI
@@ -46,14 +56,24 @@ builder.Services.AddRateLimiter(options => {
         limiterOptions.TokensPerPeriod = 2;
         limiterOptions.TokenLimit = 10;
         limiterOptions.QueueLimit = 0;
-        limiterOptions.AutoReplenishment = true;
+        limiterOptions.AutoReplenishment = true;    
         limiterOptions.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
     });
 });
 
+/* using(var log = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger())
+{
+    log.Information("Hello, Serilog");
+    log.Warning("Goodbye");
+} */
+
 var app = builder.Build();
 
 app.UseRateLimiter();
+
+app.UseOutputCache();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
