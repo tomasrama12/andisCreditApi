@@ -4,8 +4,15 @@ using CreditCardApi.Models;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
+using Serilog;
+using System.Globalization;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 
@@ -51,6 +58,26 @@ builder.Services.AddRateLimiter(options => {
     });
 });
 
+const string serviceName = "roll-dice";
+
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options
+        .SetResourceBuilder(
+            ResourceBuilder.CreateDefault()
+                .AddService(serviceName))
+        .AddConsoleExporter();
+});
+builder.Services.AddOpenTelemetry()
+      .ConfigureResource(resource => resource.AddService(serviceName))
+      .WithTracing(tracing => tracing
+          .AddAspNetCoreInstrumentation()
+          .AddConsoleExporter())
+      .WithMetrics(metrics => metrics
+          .AddAspNetCoreInstrumentation()
+          .AddConsoleExporter());
+
+
 var app = builder.Build();
 
 app.UseRateLimiter();
@@ -61,6 +88,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseAuthorization();
 

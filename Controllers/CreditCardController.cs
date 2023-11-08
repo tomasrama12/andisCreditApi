@@ -15,16 +15,25 @@ namespace CreditCardApi.Controllers
     
     public class CreditCardController : ControllerBase
     {
+        private readonly ILogger<CreditCardController> logger;
         private ICreditCardRepository creditCardRepository = null;
-        public CreditCardController(ICreditCardRepository creditCardRepo){
+        public CreditCardController(ILogger<CreditCardController> logger, ICreditCardRepository creditCardRepo){
             this.creditCardRepository = creditCardRepo;
+            this.logger = logger;
         }   
+
+        async Task<List<Models.CreditCard>> HandleGet1([FromServices]ILogger<Program> logger)
+            {
+                var result = await this.creditCardRepository.GetCreditCardsAsync();
+                logger.LogInformation("Anduvo");
+                return result;
+            }
 
         [EnableRateLimiting("SlidingWindow")]
         [HttpGet]
         public async Task<IActionResult> GetCards()
         {
-           return Ok(await this.creditCardRepository.GetCreditCardsAsync());
+            return Ok(this.creditCardRepository.GetCreditCardsAsync());
         }
         [EnableRateLimiting("Concurrency")]
         [HttpPost]
